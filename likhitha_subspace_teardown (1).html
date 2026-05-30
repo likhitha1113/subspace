@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subspace.money Product Teardown by Likhitha</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1a2e;
+    --ink-muted: #4a4a6a;
+    --ink-soft: #8888aa;
+    --paper: #fdfcf8;
+    --paper-card: #ffffff;
+    --accent: #e84855;
+    --accent-soft: #fde8ea;
+    --teal: #0f6e56;
+    --teal-soft: #d6f2ea;
+    --amber: #ba7517;
+    --amber-soft: #faeeda;
+    --purple: #534ab7;
+    --purple-soft: #eeedfe;
+    --blue-soft: #e8f2fd;
+    --blue: #1a6fc4;
+    --border: rgba(26,26,46,0.09);
+    --border-strong: rgba(26,26,46,0.18);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.7;
+    font-size: 16px;
+  }
+
+  /* COVER */
+  .cover {
+    background: linear-gradient(135deg, #1a1a2e 60%, #2d2060 100%);
+    color: #faf9f6;
+    padding: 76px 64px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -90px; right: -90px;
+    width: 340px; height: 340px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.07);
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -50px; left: 50px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+  .cover-tag {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(250,249,246,0.4);
+    margin-bottom: 26px;
+  }
+  .cover h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 54px;
+    line-height: 1.1;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .cover h1 span { color: #5ce8c0; }
+  .cover-sub {
+    font-size: 15px;
+    color: rgba(250,249,246,0.48);
+    margin-bottom: 36px;
+    max-width: 480px;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 36px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding-top: 28px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  .cover-meta-item .label {
+    font-size: 10px;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: rgba(250,249,246,0.32);
+    margin-bottom: 5px;
+  }
+  .cover-meta-item .value {
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(250,249,246,0.82);
+  }
+  .pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 22px;
+  }
+  .pill {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 100px;
+    border: 1px solid rgba(255,255,255,0.14);
+    color: rgba(250,249,246,0.6);
+    letter-spacing: 0.04em;
+  }
+
+  /* CONTENT */
+  .content {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 68px 52px;
+  }
+
+  .section-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 7px;
+  }
+
+  /* INTRO */
+  .intro-block {
+    padding: 40px 0 52px;
+    border-bottom: 1.5px solid var(--border);
+  }
+  .intro-block p {
+    font-size: 18px;
+    color: var(--ink-muted);
+    line-height: 1.8;
+    max-width: 660px;
+  }
+  .intro-block p strong { color: var(--ink); font-weight: 600; }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 34px;
+  }
+  .stat-card {
+    border-radius: 14px;
+    padding: 22px 20px;
+  }
+  .stat-card.s1 { background: var(--teal-soft); }
+  .stat-card.s2 { background: var(--purple-soft); }
+  .stat-card.s3 { background: var(--amber-soft); }
+  .stat-card .num {
+    font-family: 'Playfair Display', serif;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-card.s1 .num { color: var(--teal); }
+  .stat-card.s2 .num { color: var(--purple); }
+  .stat-card.s3 .num { color: var(--amber); }
+  .stat-card .desc { font-size: 12.5px; color: var(--ink-soft); line-height: 1.45; }
+
+  /* FEEDBACK */
+  .feedback-section {
+    padding: 60px 0;
+    border-bottom: 1.5px solid var(--border);
+  }
+  .feedback-section:last-child { border-bottom: none; }
+
+  .feedback-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 22px;
+    margin-bottom: 34px;
+  }
+  .feedback-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 60px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--border-strong);
+    flex-shrink: 0;
+    margin-top: -4px;
+  }
+  .feedback-pillar {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 7px;
+  }
+  .pillar-ux { color: var(--teal); }
+  .pillar-gtm { color: var(--accent); }
+  .pillar-features { color: var(--purple); }
+  .pillar-competitor { color: var(--amber); }
+  .pillar-collab { color: var(--blue); }
+
+  .feedback-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--ink);
+  }
+
+  /* OBS GRID */
+  .obs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .obs-cell {
+    border-radius: 14px;
+    padding: 22px 20px;
+  }
+  .obs-cell.c-observe { background: #f3f0fb; }
+  .obs-cell.c-problem { background: var(--accent-soft); }
+  .obs-cell.c-ship { background: var(--teal-soft); }
+
+  .obs-cell-label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 11px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .obs-cell.c-observe .obs-cell-label { color: var(--purple); }
+  .obs-cell.c-problem .obs-cell-label { color: var(--accent); }
+  .obs-cell.c-ship .obs-cell-label { color: var(--teal); }
+
+  .obs-cell-label .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .obs-cell.c-observe .dot { background: var(--purple); }
+  .obs-cell.c-problem .dot { background: var(--accent); }
+  .obs-cell.c-ship .dot { background: var(--teal); }
+
+  .obs-cell p { font-size: 14px; color: var(--ink-muted); line-height: 1.7; }
+  .obs-cell p strong { color: var(--ink); font-weight: 600; }
+  .obs-cell p em { font-style: italic; }
+
+  /* SCREENSHOT BLOCK */
+  .screenshot-block {
+    margin-top: 14px;
+    background: rgba(26,26,46,0.04);
+    border: 1.5px dashed rgba(26,26,46,0.15);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .screenshot-block .ss-label {
+    font-size: 10px;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+  .screenshot-block img {
+    width: 100%;
+    max-height: 700px;
+    object-fit: contain;
+    border-radius: 8px;
+    display: block;
+  }
+  .screenshot-block .ss-caption {
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    margin-top: 8px;
+    font-style: italic;
+    line-height: 1.5;
+  }
+  /* Placeholder shown when no image src is set */
+  .screenshot-block .ss-placeholder {
+    display: none;
+    background: rgba(26,26,46,0.06);
+    border-radius: 8px;
+    padding: 18px 14px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-soft);
+    line-height: 1.6;
+  }
+  .screenshot-block .ss-placeholder strong {
+    display: block;
+    color: var(--ink-muted);
+    margin-bottom: 4px;
+    font-size: 12.5px;
+  }
+  /* HOW TO ADD: replace the div.ss-placeholder with:
+     <img src="YOUR_IMAGE_PATH_HERE" alt="description" />
+     You can drag-drop your phone screenshot next to this HTML file and use its filename. */
+
+  /* INSIGHT BOX */
+  .insight-box {
+    border-radius: 0 12px 12px 0;
+    padding: 18px 22px;
+    margin-top: 14px;
+    border-left: 4px solid var(--accent);
+    background: #fff8f8;
+  }
+  .insight-box.teal { border-color: var(--teal); background: #f2fdf8; }
+  .insight-box.amber { border-color: var(--amber); background: #fffbf2; }
+  .insight-box.blue { border-color: var(--blue); background: var(--blue-soft); }
+  .insight-box p { font-size: 14px; color: var(--ink-muted); line-height: 1.7; font-style: italic; }
+  .insight-box p strong { color: var(--ink); font-style: normal; font-weight: 600; }
+
+  /* COMPETITOR TABLE */
+  .comp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+  .comp-table th {
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 700;
+    padding: 0 16px 13px 0;
+    border-bottom: 1.5px solid var(--border);
+  }
+  .comp-table td {
+    padding: 13px 16px 13px 0;
+    color: var(--ink-muted);
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.55;
+  }
+  .comp-table tr:last-child td { border-bottom: none; }
+  .comp-table td:first-child { font-weight: 600; color: var(--ink); white-space: nowrap; }
+
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 100px;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+  }
+  .badge-gap { background: var(--amber-soft); color: #854f0b; }
+  .badge-moat { background: var(--teal-soft); color: var(--teal); }
+
+  /* CLOSING */
+  .closing {
+    padding: 52px 0 36px;
+    text-align: center;
+  }
+  .closing h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 34px;
+    color: var(--ink);
+    margin-bottom: 16px;
+  }
+  .closing > p {
+    font-size: 16px;
+    color: var(--ink-muted);
+    max-width: 520px;
+    margin: 0 auto 32px;
+    line-height: 1.8;
+  }
+  .priority-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+    text-align: left;
+  }
+  .priority-item {
+    border-radius: 12px;
+    padding: 16px 14px;
+  }
+  .priority-item.p1 { background: var(--teal-soft); }
+  .priority-item.p2 { background: var(--purple-soft); }
+  .priority-item.p3 { background: var(--blue-soft); }
+  .priority-item.p4 { background: var(--accent-soft); }
+  .priority-item.p5 { background: var(--amber-soft); }
+  .priority-item .num {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 7px;
+  }
+  .priority-item.p1 .num { color: var(--teal); }
+  .priority-item.p2 .num { color: var(--purple); }
+  .priority-item.p3 .num { color: var(--blue); }
+  .priority-item.p4 .num { color: var(--accent); }
+  .priority-item.p5 .num { color: var(--amber); }
+  .priority-item p { font-size: 12px; color: var(--ink-muted); line-height: 1.5; }
+
+  @media (max-width: 680px) {
+    .content { padding: 40px 24px; }
+    .cover { padding: 52px 28px 44px; }
+    .cover h1 { font-size: 36px; }
+    .stat-row { grid-template-columns: 1fr 1fr; }
+    .obs-grid { grid-template-columns: 1fr; }
+    .priority-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-tag">Product Intern Assignment · Subspace.money Teardown</div>
+  <h1>Built for subscriptions.<br><span>Hidden from subscribers.</span></h1>
+  <p class="cover-sub">A product teardown from the perspective of a college student who actually downloaded and used the app.</p>
+  <div class="pill-row">
+    <span class="pill">UX / UI</span>
+    <span class="pill">GTM &amp; ICPs</span>
+    <span class="pill">Features</span>
+    <span class="pill">Competitor Analysis</span>
+    <span class="pill">Collaborations</span>
+  </div>
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <div class="label">Submitted by</div>
+      <div class="value">Likhitha</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Submitted on</div>
+      <div class="value">30 May 2026</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Framework</div>
+      <div class="value">Observation → Problem → Ship</div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- INTRO -->
+  <div class="intro-block">
+    <div class="section-eyebrow">Why I chose Subspace</div>
+    <p>
+      Subspace has <strong>Rs.36.5 Cr ARR, bootstrapped, profitable.</strong> That is not luck — that is a product with genuine retention. But here is what struck me: as a college student managing multiple subscriptions and shared expenses with friends, I likely represent a meaningful segment of their target audience — and I had never heard of this app before this assignment. That gap between silent retention and near-zero discovery is where this teardown begins.
+    </p>
+    <div class="stat-row">
+      <div class="stat-card s1">
+        <div class="num">Rs.36.5Cr</div>
+        <div class="desc">ARR in FY25, zero external funding</div>
+      </div>
+      <div class="stat-card s2">
+        <div class="num">90%+</div>
+        <div class="desc">Ops powered by autonomous AI agents</div>
+      </div>
+      <div class="stat-card s3">
+        <div class="num">5</div>
+        <div class="desc">Feedbacks across 5 product pillars</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEEDBACK 1: UX -->
+  <div class="feedback-section">
+    <div class="feedback-header">
+      <div class="feedback-number">01</div>
+      <div class="feedback-title-block">
+        <div class="feedback-pillar pillar-ux">UX / UI</div>
+        <div class="feedback-title">The home screen is trying to say everything at once, which makes it hard to know where to start.</div>
+      </div>
+    </div>
+    <div class="obs-grid">
+      <div class="obs-cell c-observe">
+        <div class="obs-cell-label"><span class="dot"></span>Observed</div>
+        <p>When I opened the app, the Explore screen showed <strong>Gift Cards, Rentals, Shared Subscriptions, Favourite Brands with discount percentages, and a large banner</strong> — all in a single scrollable view with no visual hierarchy. Every section competes for attention equally. Nothing tells you where to look first.</p>
+        <div class="screenshot-block">
+          <div class="ss-label">Screenshot · Explore screen</div>
+          <img src="explore2.jpg" alt="Explore screen" onerror="handleScreenshotError(this)" />
+          <div class="ss-placeholder">
+            <strong>[ Attach screenshot here ]</strong>
+            Explore screen: Gift Cards, Rentals, and Shared Subscriptions displayed without a clear visual priority.
+          </div>
+          <div class="ss-caption">Explore screen showing Gift Cards, Rentals, and Shared Subscriptions with no clear visual priority between sections.</div>
+        </div>
+      </div>
+      <div class="obs-cell c-problem">
+        <div class="obs-cell-label"><span class="dot"></span>Problem</div>
+        <p>A new user who opens Subspace for the first time does not understand what the app does in the first 5 seconds. When everything is equally visible, nothing feels important. The result is that the user scrolls past real value without recognising it. The first impression should answer <strong>"what does this do for me right now"</strong> — and currently, it does not.</p>
+      </div>
+      <div class="obs-cell c-ship">
+        <div class="obs-cell-label"><span class="dot"></span>Ship instead</div>
+        <p>Introduce <strong>progressive disclosure</strong>: one dominant card at the top (personalised spend summary or a contextual deal), with secondary sections collapsed behind clear tabs. Move Subspace Minutes to a visible shortcut on the home screen — currently it is only discoverable through the Explore page opening video, which most users will skip. A bottom navigation with clear labels (Home, Explore, Minutes, Wallet) would reduce cognitive load meaningfully.</p>
+      </div>
+    </div>
+    <div class="insight-box teal">
+      <p><strong>Tradeoff note:</strong> The current density likely reflects a deliberate choice to surface product breadth early and show how much Subspace offers. But for a first-time user, breadth without hierarchy reads as clutter rather than capability. Less visible at once tends to mean more time spent actually exploring.</p>
+    </div>
+  </div>
+
+  <!-- FEEDBACK 2: GTM -->
+  <div class="feedback-section">
+    <div class="feedback-header">
+      <div class="feedback-number">02</div>
+      <div class="feedback-title-block">
+        <div class="feedback-pillar pillar-gtm">GTM &amp; ICPs</div>
+        <div class="feedback-title">The messaging feels broad enough that it is difficult for any specific user segment to immediately recognise this was built for them.</div>
+      </div>
+    </div>
+    <div class="obs-grid">
+      <div class="obs-cell c-observe">
+        <div class="obs-cell-label"><span class="dot"></span>Observed</div>
+        <p>The tagline "Subscribe to anything, delivered in minutes" describes what the product does but does not speak to <strong>who it is for or why they should care.</strong> There is no student-specific messaging anywhere on the app home screen, no friend-group framing, and no emotional hook tied to a real student pain point.</p>
+        <div class="screenshot-block">
+          <div class="ss-label">Screenshot · Home screen</div>
+          <img src="explore.jpg" alt="Home screen" onerror="handleScreenshotError(this)" />
+          <div class="ss-placeholder">
+            <strong>[ Attach screenshot here ]</strong>
+            Home screen: "Delivery in 11 minutes" banner with generic brand tiles
+          </div>
+          <div class="ss-caption">Home screen showing "Delivery in 11 minutes" with brand discount tiles — functional copy, but no ICP-specific messaging visible.</div>
+        </div>
+      </div>
+      <div class="obs-cell c-problem">
+        <div class="obs-cell-label"><span class="dot"></span>Problem</div>
+        <p>College students and early working professionals appear to be a meaningful part of the retained user base — the Rs.36.5 Cr ARR without paid UA suggests strong organic retention in a niche. But there is no visible GTM effort targeting them. <strong>The app already has student-specific deals visible inside the app</strong> — yet there is almost no awareness of this among the very students it benefits most.</p>
+      </div>
+      <div class="obs-cell c-ship">
+        <div class="obs-cell-label"><span class="dot"></span>Ship instead</div>
+        <p>Take a cue from how <strong>Dairy Milk and FiveStar</strong> built cultural recall: two competing chocolate brands placed side by side in ads, their rivalry turned into a meme that students shared for free across social media. Subspace can do something similar. A short reel: <em>"Netflix for 4. Rs.163 each. WhatsApp your group."</em> tied to a referral code costs nothing and reaches the exact audience. The product does the work — the GTM just needs to start a conversation GenZ actually forwards.</p>
+      </div>
+    </div>
+    <div class="insight-box">
+      <p><strong>Tradeoff note:</strong> A meme-style campaign requires precise cultural calibration — done poorly it can feel forced. But given Subspace is bootstrapped and cannot afford large UA budgets, peer-to-peer cultural resonance is both the most affordable and the most credible channel for this audience. A referral code tied to every group split would compound it further.</p>
+    </div>
+  </div>
+
+  <!-- FEEDBACK 3: Features -->
+  <div class="feedback-section">
+    <div class="feedback-header">
+      <div class="feedback-number">03</div>
+      <div class="feedback-title-block">
+        <div class="feedback-pillar pillar-features">Features / Services</div>
+        <div class="feedback-title">The checkout flow asks for trust before it has earned it — and for a student spending Rs.200 to Rs.700, that is a real drop-off point.</div>
+      </div>
+    </div>
+    <div class="obs-grid">
+      <div class="obs-cell c-observe">
+        <div class="obs-cell-label"><span class="dot"></span>Observed</div>
+        <p>I went through the gift card purchase flow and the rental checkout screen. The rental checkout shows a Rental Summary with amount, duration, and delivery address — but <strong>there is no cancellation policy, no refund terms, and no "what happens if delivery fails" information visible before the Pay button.</strong> The commitment is asked for before reassurance is given.</p>
+        <div class="screenshot-block">
+          <div class="ss-label">Screenshot · Rental Checkout</div>
+          <img src="checkout.jpg" alt="Rental checkout" onerror="handleScreenshotError(this)" />
+          <div class="ss-placeholder">
+            <strong>[ Attach screenshot here ]</strong>
+            Rental Checkout: Rs.698 due, "Pay Rs.698" CTA visible — no cancellation or guarantee text
+          </div>
+          <div class="ss-caption">Rental Checkout screen showing Rs.698 amount with a Pay CTA — no cancellation policy or refund guarantee visible before payment.</div>
+        </div>
+      </div>
+      <div class="obs-cell c-problem">
+        <div class="obs-cell-label"><span class="dot"></span>Problem</div>
+        <p>For a student spending Rs.200 to Rs.700 on a timed rental or gift card, the unspoken question before payment is: <strong>"What if this goes wrong?"</strong> Without a visible answer, many users will hesitate or abandon at checkout — not because the product is unreliable, but because the interface did not reassure them at the moment they needed it most. Subspace Minutes, the most innovative feature in the app, faces the exact same trust gap.</p>
+      </div>
+      <div class="obs-cell c-ship">
+        <div class="obs-cell-label"><span class="dot"></span>Ship instead</div>
+        <p>Add a <strong>pre-payment summary screen</strong> that explicitly shows: what the user is getting, when it will arrive, what the cancellation window is, and a one-line refund guarantee. Think of how Swiggy shows "Order placed — track your delivery" immediately after payment. That single confirmation loop is what turns a nervous first purchase into a repeat habit. Subspace needs the equivalent moment of <strong>clarity before commitment.</strong></p>
+      </div>
+    </div>
+    <div class="insight-box">
+      <p><strong>Tradeoff note:</strong> Adding a screen adds friction to the checkout flow, which typically hurts conversion. But a single well-placed trust screen is likely to increase completed purchases among first-time users, who are the highest drop-off segment. The tradeoff is worth making.</p>
+    </div>
+  </div>
+
+  <!-- FEEDBACK 4: Competitor Analysis -->
+  <div class="feedback-section">
+    <div class="feedback-header">
+      <div class="feedback-number">04</div>
+      <div class="feedback-title-block">
+        <div class="feedback-pillar pillar-competitor">Competitor Analysis</div>
+        <div class="feedback-title">Subspace's real competition is not another app. It is habit and inertia.</div>
+      </div>
+    </div>
+
+    <p style="font-size:15px; color: var(--ink-muted); margin-bottom: 22px; line-height: 1.75;">Direct competitors (myPaisaa, MoneyClub, Finlok) are significantly smaller in product depth and traction. The more meaningful competitive pressure comes from habit-substitutes and feature-adjacent platforms students already use every day.</p>
+
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>Competitor</th>
+          <th>What they do</th>
+          <th>Where Subspace wins</th>
+          <th>Where the gap is</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>CRED</td>
+          <td>Bill pay and rewards for users with credit scores above 750. Premium positioning.</td>
+          <td>Subspace serves students without credit cards. These are entirely different ICPs.</td>
+          <td><span class="badge badge-gap">Awareness</span> CRED benefits from significantly higher consumer awareness among young Indians.</td>
+        </tr>
+        <tr>
+          <td>Splitwise</td>
+          <td>Expense splitting and tracking. No payments. Widely used in colleges.</td>
+          <td>Subspace closes the loop — split and pay. Splitwise only records who owes what.</td>
+          <td><span class="badge badge-gap">Habit</span> Splitwise is already embedded in group behaviour. Switching cost is real.</td>
+        </tr>
+        <tr>
+          <td>myPaisaa / Finlok</td>
+          <td>Group savings and basic subscription tracking.</td>
+          <td>Subspace has a deeper product, a live marketplace, and Rs.36.5 Cr ARR. Significantly ahead.</td>
+          <td><span class="badge badge-moat">Moat</span> Subspace leads clearly in this direct-competitor category.</td>
+        </tr>
+        <tr>
+          <td>PhonePe / GPay</td>
+          <td>UPI payments with auto-detected recurring spends. Already installed on most phones.</td>
+          <td>Subspace is active (share, save, negotiate) not just passive (tracks what you spent).</td>
+          <td><span class="badge badge-gap">Default</span> GPay is the default app. Subspace needs a compelling reason to earn a separate install.</td>
+        </tr>
+        <tr>
+          <td>WhatsApp + UPI</td>
+          <td>Students manually coordinate and split costs over chat. Zero setup needed.</td>
+          <td>Subspace automates the recurring coordination. Significant value once users know it exists.</td>
+          <td><span class="badge badge-gap">Inertia</span> "This is fine" is the hardest competitor to displace. The status quo has no switching cost.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="insight-box amber">
+      <p><strong>Strategic implication:</strong> Subspace should not position against other apps. The more useful frame is positioning against invisible waste. The message is not "use us instead of X" — it is "you are collectively losing Rs.400 a month on subscriptions you forgot about or are overpaying for. We fixed that." Make the competitor the problem, not a product.</p>
+    </div>
+  </div>
+
+  <!-- FEEDBACK 5: Collaborations -->
+  <div class="feedback-section">
+    <div class="feedback-header">
+      <div class="feedback-number">05</div>
+      <div class="feedback-title-block">
+        <div class="feedback-pillar pillar-collab">Potential Collaborations</div>
+        <div class="feedback-title">Student deals exist inside the app. They just do not appear at the moment students actually need them.</div>
+      </div>
+    </div>
+    <div class="obs-grid">
+      <div class="obs-cell c-observe">
+        <div class="obs-cell-label"><span class="dot"></span>Observed</div>
+        <p>The app carries deals across Food, Entertainment, Clothing, and Shopping categories — brands like Zomato, Myntra, and PVR are visible in the marketplace. But <strong>the deal discovery experience is entirely non-contextual</strong> — offers are displayed in a static grid regardless of the time, the day, or what is happening in a student's week. There is also no task-completion mechanism to earn deals.</p>
+        <div class="screenshot-block">
+          <div class="ss-label">Screenshot · Shared Subscriptions screen</div>
+          <img src="groups.jpg" alt="Shared subscriptions" onerror="handleScreenshotError(this)" />
+          <div class="ss-placeholder">
+            <strong>[ Attach screenshot here ]</strong>
+            Shared Subscriptions: Netflix Rs.163/device, Spotify Rs.900, YouTube Rs.99 — deals present but no timing or trigger logic
+          </div>
+          <div class="ss-caption">Shared Subscriptions screen showing Netflix, Spotify, YouTube Premium deals — useful offers, but no contextual trigger or moment-based logic visible.</div>
+        </div>
+      </div>
+      <div class="obs-cell c-problem">
+        <div class="obs-cell-label"><span class="dot"></span>Problem</div>
+        <p>Students do not browse for deals in isolation — they are triggered by moments: a Friday group dinner plan, a college cultural fest, an internship completion. A Swiggy group deal appearing on a Tuesday afternoon or a fashion offer appearing three weeks after a fest ends is functionally invisible. <strong>Timing is as important as relevance for this ICP.</strong> Think of how Zepto pushed ice cream deals exactly when temperatures peaked — same product, right moment, massive conversion.</p>
+         <div class="screenshot-block">
+          <div class="ss-label">Screenshot · Gift Cards screen</div>
+          <img src="giftcards.jpg" alt="Gift cards" onerror="handleScreenshotError(this)" />
+         
+          
+        </div>
+      </div>
+      <div class="obs-cell c-ship">
+        <div class="obs-cell-label"><span class="dot"></span>Ship instead</div>
+        <p>Build a <strong>student calendar layer</strong> into offer logic. Partner with Swiggy for Friday evening group order deals (Subspace already handles bill splits — this closes the loop entirely). Partner with Myntra or Ajio for clothing deals two weeks before major college fest dates in Tier 1 cities. Partner with Unstop or Internshala for reward codes on task completion, similar to how Zepto turned a heatwave into a sales moment. Make the offer feel like it arrived at exactly the right time.</p>
+      </div>
+    </div>
+    <div class="insight-box blue">
+      <p><strong>The sharpest collab to pitch first — Swiggy group orders:</strong> A group of 4 friends ordering Swiggy together, splitting the bill over WhatsApp, and manually transferring money is already a weekly college ritual. Subspace already handles the split. A Swiggy integration would mean: one group order, automatic split, one tap to settle. That is not a discount — it is a workflow. Workflows are far stickier than coupons.</p>
+    </div>
+  </div>
+
+  <!-- CLOSING -->
+  <div class="closing">
+    <div class="section-eyebrow">Priority Logic</div>
+    <h2>If I could ship one thing first</h2>
+    <p>Each of these five feedbacks is connected. The trust layer in the checkout flow should ship first — it converts users who are already curious and already in the funnel. The home screen fix comes next, then the Swiggy collab, then GTM. That sequence compounds.</p>
+    <div class="priority-grid">
+      <div class="priority-item p1">
+        <div class="num">P1</div>
+        <p>Checkout trust layer — converts existing in-funnel users</p>
+      </div>
+      <div class="priority-item p2">
+        <div class="num">P2</div>
+        <p>Home screen progressive disclosure + Minutes shortcut</p>
+      </div>
+      <div class="priority-item p3">
+        <div class="num">P3</div>
+        <p>Swiggy group order collab as a workflow, not a coupon</p>
+      </div>
+      <div class="priority-item p4">
+        <div class="num">P4</div>
+        <p>Meme-native GTM campaign targeting college groups</p>
+      </div>
+      <div class="priority-item p5">
+        <div class="num">P5</div>
+        <p>Contextual offer timing tied to student calendar moments</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function handleScreenshotError(img) {
+    img.style.display = 'none';
+    const placeholder = img.nextElementSibling;
+    if (placeholder && placeholder.classList.contains('ss-placeholder')) {
+      placeholder.style.display = 'block';
+    }
+  }
+</script>
+</body>
+</html>
